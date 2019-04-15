@@ -21,6 +21,7 @@ class ExternalIssueList extends AsyncComponent {
     group: SentryTypes.Group.isRequired,
     project: SentryTypes.Project.isRequired,
     organization: SentryTypes.Organization.isRequired,
+    event: SentryTypes.Event,
     orgId: PropTypes.string,
   };
 
@@ -145,6 +146,7 @@ class ExternalIssueList extends AsyncComponent {
         <SentryAppExternalIssueActions
           key={sentryApp.slug}
           group={group}
+          event={this.props.event}
           sentryAppComponent={component}
           sentryAppInstallation={installation}
           externalIssue={issue}

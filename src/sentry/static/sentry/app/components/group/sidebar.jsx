@@ -250,6 +250,7 @@ const GroupSidebar = createReactClass({
           allEnvironments={this.state.allEnvironmentsGroupData}
         />
         <ExternalIssueList
+          event={this.props.event}
           group={this.props.group}
           project={project}
           orgId={organization.slug}
