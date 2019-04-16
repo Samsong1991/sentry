@@ -83,13 +83,13 @@ def translate(pat):
 
 
 event_search_grammar = Grammar(r"""
-# raw_search must come at the end, otherwise other
-# search_terms will be treated as a raw query
-search          = search_term* raw_search?
-search_term     = space? (time_filter / rel_time_filter / specific_time_filter
+search          = search_term*
+search_term     = key_val_term / quoted_raw_search / raw_search
+key_val_term    = space? (time_filter / rel_time_filter / specific_time_filter
                   / numeric_filter / has_filter / is_filter / basic_filter)
                   space?
-raw_search      = ~r".+$"
+raw_search      = ~r"\ *([^\ ^\n]+)\ *"
+quoted_raw_search = ~r"\ *\"([^\"]+)\"\ *"
 
 # standard key:val filter
 basic_filter    = negation? search_key sep search_value
@@ -217,10 +217,6 @@ class SearchVisitor(NodeVisitor):
     def visit_search(self, node, children):
         # there is a list from search_term and one from raw_search, so flatten them.
         # Flatten each group in the list, since nodes can return multiple items
-        #
-        # XXX(mitsuhiko): I do not comprehend why this is not just
-        # _flatten(children) but when I do that nothing works.  I only
-        # inherited this code.
         def _flatten(seq):
             for item in seq:
                 if isinstance(item, list):
@@ -229,15 +225,43 @@ class SearchVisitor(NodeVisitor):
                 else:
                     yield item
         children = [child for group in children for child in _flatten(group)]
-        return filter(None, _flatten(children))
+        children = filter(None, _flatten(children))
+        results = []
+        cur_message = None
+        # Now collapse all adjacent `message` filters together. The assumption
+        # being that any messages next to each other are part of the same term,
+        # but if they're separated by a tag then they're a separate term.
+        for child in children:
+            if child.key.name == 'message':
+                if cur_message is None:
+                    cur_message = child
+                else:
+                    cur_message = cur_message._replace(
+                        value=SearchValue(
+                            u'%s %s' % (
+                                cur_message.value.raw_value,
+                                child.value.raw_value,
+                            ),
+                        ),
+                    )
+            else:
+                if cur_message is not None:
+                    results.append(cur_message)
+                    cur_message = None
+                results.append(child)
 
-    def visit_search_term(self, node, children):
-        _, search_term, _ = children
-        # search_term is a list because of group
-        return search_term[0]
+        if cur_message is not None:
+            results.append(cur_message)
+
+        return results
+
+    def visit_key_val_term(self, node, children):
+        _, key_val_term, _ = children
+        # key_val_term is a list because of group
+        return key_val_term[0]
 
     def visit_raw_search(self, node, children):
-        value = node.text
+        value = node.match.groups()[0]
 
         while value.startswith('"') and value.endswith('"') and value != '"':
             value = value[1:-1]
@@ -249,6 +273,13 @@ class SearchVisitor(NodeVisitor):
             SearchKey('message'),
             "=",
             SearchValue(value),
+        )
+
+    def visit_quoted_raw_search(self, node, children):
+        return SearchFilter(
+            SearchKey('message'),
+            "=",
+            SearchValue(node.match.groups()[0]),
         )
 
     def visit_numeric_filter(self, node, (search_key, _, operator, search_value)):
