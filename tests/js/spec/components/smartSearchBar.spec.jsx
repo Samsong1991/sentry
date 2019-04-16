@@ -44,9 +44,7 @@ describe('SmartSearchBar', function() {
     supportedTags = {};
     organization = TestStubs.Organization({id: '123'});
 
-    options = {
-      context: {organization},
-    };
+    options = TestStubs.routerContext([{organization}]);
 
     environmentTagValuesMock = MockApiClient.addMockResponse({
       url: '/projects/123/456/tags/environment/values/',

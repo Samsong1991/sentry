@@ -52,7 +52,7 @@ class SearchDropdown extends React.PureComponent {
         <SearchDropdownGroupTitle>
           <GroupTitleIcon className={classNames('icon', item.icon)} />
           {item.title && item.title}
-          <span>{this.renderDescription(item)}</span>
+          {item.desc && <span>{item.desc}</span>}
         </SearchDropdownGroupTitle>
       </SearchDropdownGroup>
     );
@@ -77,23 +77,21 @@ class SearchDropdown extends React.PureComponent {
     const {className, loading, items} = this.props;
     return (
       <StyledSearchDropdown className={className}>
-        <div>
-          {loading ? (
-            <div key="loading" data-test-id="search-autocomplete-loading">
-              <LoadingIndicator mini={true} />
-            </div>
-          ) : (
-            <SearchItemsList>
-              {items.map(item => {
-                if (item.type === 'header') {
-                  return this.renderHeaderItem(item);
-                }
+        {loading ? (
+          <LoadingWrapper key="loading" data-test-id="search-autocomplete-loading">
+            <LoadingIndicator mini={true} />
+          </LoadingWrapper>
+        ) : (
+          <SearchItemsList>
+            {items.map(item => {
+              if (item.type === 'header') {
+                return this.renderHeaderItem(item);
+              }
 
-                return this.renderItem(item);
-              })}
-            </SearchItemsList>
-          )}
-        </div>
+              return this.renderItem(item);
+            })}
+          </SearchItemsList>
+        )}
       </StyledSearchDropdown>
     );
   }
@@ -110,8 +108,14 @@ const StyledSearchDropdown = styled('div')`
   right: 0;
   left: 0;
   background: #fff;
-  z-index: 100;
+  z-index: ${p => p.theme.zIndex.dropdown};
   overflow: hidden;
+`;
+
+const LoadingWrapper = styled('div')`
+  display: flex;
+  justify-content: center;
+  padding: ${space(1)};
 `;
 
 const ListItem = styled('li')`
@@ -166,5 +170,5 @@ const SearchItemTitleWrapper = styled('h5')`
 
 const SearchItemExample = styled('div')`
   font-size: ${p => p.theme.fontSizeSmall};
-  font-family: ${p => p.theme.familyMono};
+  font-family: ${p => p.theme.text.familyMono};
 `;

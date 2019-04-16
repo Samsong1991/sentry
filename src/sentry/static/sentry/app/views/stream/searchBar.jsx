@@ -162,7 +162,6 @@ class SearchBar extends React.Component {
       savedSearch,
       ...props
     } = this.props;
-    console.log(this.state.defaultSearchItems);
 
     return (
       <SmartSearchBar
