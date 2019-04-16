@@ -12,8 +12,8 @@ import Alert from 'app/components/alert';
 import Button from 'app/components/button';
 import HookStore from 'app/stores/hookStore';
 import PageHeading from 'app/components/pageHeading';
-import PlatformPicker from 'app/views/onboarding/project/platformpicker';
-import PlatformiconTile from 'app/views/onboarding/project/platformiconTile';
+import PlatformPicker from 'app/components/platformPicker';
+import PlatformIconTile from 'app/components/platformIconTile';
 import ProjectActions from 'app/actions/projectActions';
 import SelectControl from 'app/components/forms/selectControl';
 import SentryTypes from 'app/sentryTypes';
@@ -152,7 +152,7 @@ class CreateProject extends React.Component {
             <div>
               <FormLabel>{t('Give your project a name')}</FormLabel>
               <ProjectNameInput>
-                <ProjectPlatformicon monoTone platform={platform} />
+                <ProjectPlatformIcon monoTone platform={platform} />
                 <input
                   type="text"
                   name="name"
@@ -231,7 +231,7 @@ const FormLabel = styled('div')`
   margin-bottom: ${space(1)};
 `;
 
-const ProjectPlatformicon = styled(PlatformiconTile)`
+const ProjectPlatformIcon = styled(PlatformIconTile)`
   font-size: 25px;
 `;
 

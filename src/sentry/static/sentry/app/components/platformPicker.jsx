@@ -14,7 +14,7 @@ import ExternalLink from 'app/components/externalLink';
 import InlineSvg from 'app/components/inlineSvg';
 import ListLink from 'app/components/listLink';
 import NavTabs from 'app/components/navTabs';
-import PlatformiconTile from 'app/views/onboarding/project/platformiconTile';
+import PlatformIconTile from 'app/components/platformIconTile';
 import space from 'app/styles/space';
 
 const PLATFORM_CATEGORIES = categoryList.concat({id: 'all', name: t('All')});
@@ -189,7 +189,7 @@ const PlatformList = styled('div')`
   grid-template-columns: repeat(auto-fill, 112px);
 `;
 
-const StyledPlatformiconTile = styled(PlatformiconTile)`
+const StyledPlatformIconTile = styled(PlatformIconTile)`
   width: 56px;
   height: 56px;
   font-size: 42px;
@@ -214,7 +214,7 @@ const ClearButton = styled(p => (
 
 const PlatformCard = styled(({platform, selected, onClear, ...props}) => (
   <div {...props}>
-    <StyledPlatformiconTile platform={platform.id} />
+    <StyledPlatformIconTile platform={platform.id} />
     <h3>{platform.name}</h3>
     {selected && <ClearButton onClick={onClear} />}
   </div>

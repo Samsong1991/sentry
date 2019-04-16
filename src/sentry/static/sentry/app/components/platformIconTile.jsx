@@ -77,7 +77,7 @@ const getColorStyles = ({monoTone, platform}) => {
   );
 };
 
-const PlatformiconTile = styled('div')`
+const PlatformIconTile = styled('div')`
   /* stylelint-disable-next-line font-family-no-missing-generic-family-keyword */
   font-family: 'platformicons';
   font-weight: normal;
@@ -91,10 +91,10 @@ const PlatformiconTile = styled('div')`
   }
 `;
 
-PlatformiconTile.propTypes = {
+PlatformIconTile.propTypes = {
   platform: PropTypes.string,
   className: PropTypes.string,
   monoTone: PropTypes.bool,
 };
 
-export default PlatformiconTile;
+export default PlatformIconTile;
