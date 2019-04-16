@@ -269,10 +269,10 @@ class SmartSearchBar extends React.Component {
     // If the environment feature is active and excludeEnvironment = true
     // then remove the environment key
     if (this.props.excludeEnvironment) {
-      return tagKeys.filter(key => key !== 'environment:');
-    } else {
-      return tagKeys;
+      tagKeys = tagKeys.filter(key => key !== 'environment:');
     }
+
+    return tagKeys.map(value => ({value, desc: value}));
   };
 
   /**
@@ -311,7 +311,12 @@ class SmartSearchBar extends React.Component {
    * with results
    */
   getPredefinedTagValues = function(tag, query) {
-    return tag.values.filter(value => value.indexOf(query) > -1);
+    return tag.values
+      .filter(value => value.indexOf(query) > -1)
+      .map(value => ({
+        value,
+        desc: value,
+      }));
   };
 
   /**
@@ -342,7 +347,22 @@ class SmartSearchBar extends React.Component {
       fullQuery
     );
 
-    return (recentSearches && recentSearches.map(({query}) => ({query}))) || [];
+    return [
+      ...(recentSearches && [
+        {
+          type: 'header',
+          title: t('Recent Searches'),
+          icon: 'icon-clock',
+        },
+      ]),
+      ...(recentSearches &&
+        recentSearches.map(({query}) => ({
+          desc: query,
+          value: query,
+          className: 'icon-clock',
+          type: 'recent-search',
+        }))),
+    ];
   };
 
   onInputClick = () => {
@@ -379,7 +399,11 @@ class SmartSearchBar extends React.Component {
 
         const tagKeys = this.getTagKeys('');
         const recentSearches = await this.getRecentSearches();
-        this.updateAutoCompleteState(tagKeys, recentSearches, '');
+        this.updateAutoCompleteState(
+          [{title: t('Tags'), type: 'header', icon: 'icon-tag'}, ...tagKeys],
+          recentSearches,
+          ''
+        );
         return;
       }
 
@@ -408,7 +432,11 @@ class SmartSearchBar extends React.Component {
       const recentSearches = await this.getRecentSearches();
 
       this.setState({searchTerm: matchValue});
-      this.updateAutoCompleteState(autoCompleteItems, recentSearches, matchValue);
+      this.updateAutoCompleteState(
+        [{title: t('Tags'), type: 'header', icon: 'icon-tag'}, ...autoCompleteItems],
+        recentSearches,
+        matchValue
+      );
     } else {
       const {supportedTags, prepareQuery} = this.props;
 
@@ -454,7 +482,11 @@ class SmartSearchBar extends React.Component {
         this.getRecentSearches(),
       ]);
 
-      this.updateAutoCompleteState(tagValues, recentSearches, tag.key);
+      this.updateAutoCompleteState(
+        [{title: t('Tag Values'), type: 'header'}, ...tagValues],
+        recentSearches,
+        tag.key
+      );
       return;
     }
     return;
@@ -465,54 +497,17 @@ class SmartSearchBar extends React.Component {
   updateAutoCompleteState = (searchItems, recentSearchItems, tagName) => {
     const {maxSearchItems} = this.props;
 
-    searchItems = searchItems.map(item => {
-      const out = {
-        desc: item,
-        value: item,
-      };
-
-      // Specify icons according to tag value
-      switch (tagName || item.replace(':', '')) {
-        case 'is':
-          out.className = 'icon-toggle';
-          break;
-        case 'assigned':
-        case 'bookmarks':
-          out.className = 'icon-user';
-          break;
-        case 'firstSeen':
-        case 'lastSeen':
-        case 'event.timestamp':
-          out.className = 'icon-av_timer';
-          break;
-        default:
-          out.className = 'icon-tag';
-      }
-
-      if (item.type === 'recent-search') {
-        out.className = 'icon-clock';
-      }
-
-      return out;
-    });
-
-    if (searchItems.length > 0) {
-      searchItems[0].active = true;
+    if (searchItems && searchItems.length > 0) {
+      const index = _.findIndex(searchItems, item => item.type !== 'header');
+      searchItems[index].active = true;
     }
 
     if (maxSearchItems && maxSearchItems > 0) {
       searchItems = searchItems.slice(0, maxSearchItems);
     }
 
-    const recentItems = recentSearchItems.map(item => ({
-      desc: item.query,
-      value: item.query,
-      className: 'icon-clock',
-      type: 'recent-search',
-    }));
-
     this.setState({
-      searchItems: [...searchItems, ...recentItems],
+      searchItems: [...searchItems, ...recentSearchItems],
       activeSearchItem: 0,
     });
   };

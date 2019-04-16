@@ -11,6 +11,11 @@ import withOrganization from 'app/utils/withOrganization';
 
 const SEARCH_ITEMS = [
   {
+    title: t('Common Search Terms'),
+    type: 'header',
+    icon: 'icon-star-outline',
+  },
+  {
     title: t('Tag'),
     desc: t('key/value pair associated to an issue'),
     example: 'browser:"Chrome 34", has:browser',
@@ -51,10 +56,9 @@ const SEARCH_ITEMS = [
     type: 'default',
   },
   {
-    desc: t('or paste an event id to jump straight to it'),
-    className: 'icon-hash',
-    value: '',
-    type: 'default',
+    title: t('or paste an event id to jump straight to it'),
+    type: 'header',
+    icon: 'icon-hash',
   },
 ];
 
@@ -101,6 +105,13 @@ class SearchBar extends React.Component {
 
     this.setState({
       defaultSearchItems: [
+        ...(resp && [
+          {
+            type: 'header',
+            title: t('Recent Searches'),
+            icon: 'icon-clock',
+          },
+        ]),
         ...(resp &&
           resp.map(query => ({
             desc: query,
@@ -151,6 +162,7 @@ class SearchBar extends React.Component {
       savedSearch,
       ...props
     } = this.props;
+    console.log(this.state.defaultSearchItems);
 
     return (
       <SmartSearchBar
