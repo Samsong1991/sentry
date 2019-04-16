@@ -1,14 +1,14 @@
 import {Flex} from 'grid-emotion';
 import React from 'react';
-import styled from 'react-emotion';
 import marked from 'marked';
+import styled from 'react-emotion';
 
 import {extractMultilineFields} from 'app/utils';
-import {flattenedPlatforms} from 'app/views/onboarding/utils';
 import {t, tct, tn} from 'app/locale';
-import PlatformIcon from 'app/components/platformIcon';
 import HintPanelItem from 'app/components/panels/hintPanelItem';
+import PlatformIcon from 'app/components/platformIcon';
 import getDynamicText from 'app/utils/getDynamicText';
+import platforms from 'app/data/platforms';
 import slugify from 'app/utils/slugify';
 import space from 'app/styles/space';
 
@@ -64,7 +64,7 @@ export const fields = {
     type: 'array',
     label: t('Platform'),
     choices: () =>
-      flattenedPlatforms.map(({id, name}) => [
+      platforms.map(({id, name}) => [
         id,
         <PlatformWrapper key={id}>
           <StyledPlatformIcon platform={id} size="20" />
